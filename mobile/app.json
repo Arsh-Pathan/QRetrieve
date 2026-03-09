@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "QRetrieve",
+    "slug": "qretrieve",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "qretrieve",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "icon": "./assets/icon.png",
+    "splash": {
+      "backgroundColor": "#6c63ff"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#6c63ff"
+      },
+      "package": "com.arshio.qretrieve",
+      "permissions": [
+        "CAMERA",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
+    },
+    "ios": {
+      "bundleIdentifier": "com.arshio.qretrieve",
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "QRetrieve needs camera access to scan QR codes",
+        "NSLocationWhenInUseUsageDescription": "QRetrieve uses your location to autofill where you found an item"
+      }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-camera",
+      "expo-location",
+      "expo-notifications"
+    ]
+  }
+}

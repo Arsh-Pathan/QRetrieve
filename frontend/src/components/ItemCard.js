@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import QRGeneratorWidget from './QRGeneratorWidget';
-import './ItemCard.css';
+import '../styles/ItemCard.css';
 
 function ItemCard({ item }) {
   const [showQR, setShowQR] = useState(false);

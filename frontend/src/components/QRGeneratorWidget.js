@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import QRDownloadPanel from './QRDownloadPanel';
-import './QRGeneratorWidget.css';
+import '../styles/QRGeneratorWidget.css';
 
 const SIZE_PRESETS = [
   { label: 'Small', description: 'Keychain / Sticker', pixels: 128 },

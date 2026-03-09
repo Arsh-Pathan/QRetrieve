@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
-import './QRDownloadPanel.css';
+import '../styles/QRDownloadPanel.css';
 
 function QRDownloadPanel({ itemId, itemName, qrValue, size, showLabel }) {
   const canvasRef = useRef(null);

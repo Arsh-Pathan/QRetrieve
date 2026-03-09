@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { createItem } from '../services/api';
 import QRGeneratorWidget from '../components/QRGeneratorWidget';
 import { useNotification } from '../hooks/useNotification';
-import './HomePage.css';
+import '../styles/HomePage.css';
 
 function HomePage() {
   const [ownerName, setOwnerName] = useState('');

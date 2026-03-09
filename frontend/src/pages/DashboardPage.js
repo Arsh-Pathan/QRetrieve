@@ -3,7 +3,7 @@ import { getItems, getReports } from '../services/api';
 import ItemCard from '../components/ItemCard';
 import ReportCard from '../components/ReportCard';
 import { useNotification } from '../hooks/useNotification';
-import './DashboardPage.css';
+import '../styles/DashboardPage.css';
 
 function DashboardPage() {
   const [activeTab, setActiveTab] = useState('items');

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { getItemByItemId, submitReport } from '../services/api';
 import FoundReportForm from '../components/FoundReportForm';
-import './FoundPage.css';
+import '../styles/FoundPage.css';
 
 function FoundPage() {
   const { itemId } = useParams();

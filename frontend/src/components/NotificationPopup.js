@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNotification } from '../hooks/useNotification';
-import './NotificationPopup.css';
+import '../styles/NotificationPopup.css';
 
 function NotificationPopup() {
   const { notification, dismissNotification } = useNotification();

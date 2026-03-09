@@ -1,5 +1,5 @@
 import React from 'react';
-import './ReportCard.css';
+import '../styles/ReportCard.css';
 
 function ReportCard({ report }) {
   const formatDate = (dateStr) => {

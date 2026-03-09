@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useGeolocation } from '../hooks/useGeolocation';
-import './FoundReportForm.css';
+import '../styles/FoundReportForm.css';
 
 function FoundReportForm({ itemId, itemName, onSubmit, isSubmitting }) {
   const [finderName, setFinderName] = useState('');
