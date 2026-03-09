@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # MongoDB database
+  mongodb:
+    image: mongo:7
+    container_name: qretrieve-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - qretrieve-net
+
+  # Express backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: qretrieve-backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - MONGODB_URI=mongodb://mongodb:27017/qretrieve
+      - BASE_URL=https://qretrieve.app
+      - NODE_ENV=production
+    depends_on:
+      - mongodb
+    networks:
+      - qretrieve-net
+
+  # React frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: qretrieve-frontend
+    restart: unless-stopped
+    networks:
+      - qretrieve-net
+
+  # Nginx reverse proxy
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: qretrieve-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - qretrieve-net
+
+volumes:
+  mongo-data:
+
+networks:
+  qretrieve-net:
+    driver: bridge
