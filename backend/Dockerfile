@@ -7,6 +7,6 @@ RUN npm install --only=production
 
 COPY src/ ./src/
 
-EXPOSE 5000
+EXPOSE 7600
 
 CMD ["node", "src/server.js"]

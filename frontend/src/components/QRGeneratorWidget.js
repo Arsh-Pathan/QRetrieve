@@ -21,7 +21,7 @@ function QRGeneratorWidget({ itemId, itemName }) {
   const [customUnit, setCustomUnit] = useState('px');
   const [showLabel, setShowLabel] = useState(true);
 
-  const baseUrl = process.env.REACT_APP_BASE_URL || 'https://qretrieve.app';
+  const baseUrl = process.env.REACT_APP_BASE_URL || 'https://QRetrieve.arsh-io.website';
   const qrValue = `${baseUrl}/found/${itemId}`;
 
   const getPixelSize = () => {

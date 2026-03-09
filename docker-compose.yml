@@ -7,7 +7,7 @@ services:
     container_name: qretrieve-mongodb
     restart: unless-stopped
     ports:
-      - "27017:27017"
+      - "27018:27017"
     volumes:
       - mongo-data:/data/db
     networks:
@@ -21,11 +21,11 @@ services:
     container_name: qretrieve-backend
     restart: unless-stopped
     ports:
-      - "5000:5000"
+      - "7600:7600"
     environment:
-      - PORT=5000
+      - PORT=7600
       - MONGODB_URI=mongodb://mongodb:27017/qretrieve
-      - BASE_URL=https://qretrieve.app
+      - BASE_URL=https://QRetrieve.arsh-io.website
       - NODE_ENV=production
     depends_on:
       - mongodb
@@ -50,7 +50,7 @@ services:
     container_name: qretrieve-nginx
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "7700:7700"
     depends_on:
       - frontend
       - backend
