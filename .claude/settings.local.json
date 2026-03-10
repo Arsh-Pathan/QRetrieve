@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm:*)",
+      "Bash(mkdir:*)",
+      "Bash(npx expo:*)",
+      "Bash(npx create-expo-app@latest:*)",
+      "Bash(cp:*)"
+    ]
+  }
+}

@@ -1,7 +1,4 @@
-version: '3.8'
-
 services:
-  # MongoDB database
   mongodb:
     image: mongo:7
     container_name: qretrieve-mongodb
@@ -13,7 +10,6 @@ services:
     networks:
       - qretrieve-net
 
-  # Express backend API
   backend:
     build:
       context: ./backend
@@ -27,12 +23,16 @@ services:
       - MONGODB_URI=mongodb://mongodb:27017/qretrieve
       - BASE_URL=https://QRetrieve.arsh-io.website
       - NODE_ENV=production
+      - JWT_SECRET=${JWT_SECRET:-qretrieve-production-secret-change-me}
+      - JWT_EXPIRES_IN=7d
+      - UPLOAD_DIR=uploads
+    volumes:
+      - uploads-data:/app/uploads
     depends_on:
       - mongodb
     networks:
       - qretrieve-net
 
-  # React frontend
   frontend:
     build:
       context: ./frontend
@@ -42,7 +42,6 @@ services:
     networks:
       - qretrieve-net
 
-  # Nginx reverse proxy
   nginx:
     build:
       context: ./nginx
@@ -59,6 +58,7 @@ services:
 
 volumes:
   mongo-data:
+  uploads-data:
 
 networks:
   qretrieve-net:
