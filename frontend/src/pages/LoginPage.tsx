@@ -26,19 +26,40 @@ export function LoginPage() {
   };
 
   return (
-    <Card>
-      <h2 className="text-xl font-bold text-text-primary mb-6">Welcome back</h2>
+    <Card className="animate-slide-up">
+      <h2 className="text-xl font-bold text-text-primary mb-1">Welcome back</h2>
+      <p className="text-sm text-text-muted mb-5">Sign in to manage your items</p>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <Input label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        {error && <p className="text-sm text-red-500">{error}</p>}
-        <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? 'Signing in...' : 'Sign In'}
+        <Input
+          label="Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          placeholder="you@example.com"
+          icon={<span className="text-sm">📧</span>}
+        />
+        <Input
+          label="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          placeholder="••••••••"
+          icon={<span className="text-sm">🔒</span>}
+        />
+        {error && (
+          <div className="p-3 rounded-2xl bg-pastel-peach-light text-sm text-red-600">
+            {error}
+          </div>
+        )}
+        <Button type="submit" className="w-full" loading={loading}>
+          Sign In
         </Button>
       </form>
-      <p className="text-center text-sm text-text-secondary mt-4">
+      <p className="text-center text-sm text-text-secondary mt-5">
         Don't have an account?{' '}
-        <Link to="/register" className="text-accent-coral font-medium hover:underline">Sign up</Link>
+        <Link to="/register" className="text-accent-purple font-semibold hover:underline">Sign up</Link>
       </p>
     </Card>
   );

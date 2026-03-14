@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, Alert, Image } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, Alert, Image, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
+import QRCode from 'react-native-qrcode-svg';
 import { api } from '../../services/api';
-import { colors, spacing, radius, fonts } from '../../constants/theme';
+import { BASE_URL } from '../../constants/config';
+import { colors, spacing, radius, fonts, shadows } from '../../constants/theme';
 import { ItemCard } from '../../components/ItemCard';
 
 export default function ItemsScreen() {
@@ -14,6 +16,10 @@ export default function ItemsScreen() {
   const [description, setDescription] = useState('');
   const [photo, setPhoto] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  // QR Success Modal state — BUG FIX
+  const [createdItem, setCreatedItem] = useState<any>(null);
+  const [showQRFor, setShowQRFor] = useState<any>(null);
 
   const fetchItems = useCallback(async () => {
     try {
@@ -44,7 +50,11 @@ export default function ItemsScreen() {
         const ext = photo.split('.').pop() || 'jpg';
         formData.append('photo', { uri: photo, name: `photo.${ext}`, type: `image/${ext}` } as any);
       }
-      await api.post('/items', formData);
+      const newItem = await api.post<any>('/items', formData);
+
+      // BUG FIX: Show QR immediately after creation
+      setCreatedItem(newItem);
+
       setItemName('');
       setDescription('');
       setPhoto(null);
@@ -58,7 +68,7 @@ export default function ItemsScreen() {
   };
 
   const handleDelete = async (itemId: string) => {
-    Alert.alert('Delete', 'Delete this item?', [
+    Alert.alert('Delete', 'Delete this item? This cannot be undone.', [
       { text: 'Cancel' },
       { text: 'Delete', style: 'destructive', onPress: async () => { await api.delete(`/items/${itemId}`); fetchItems(); } },
     ]);
@@ -67,33 +77,131 @@ export default function ItemsScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
-        <Text style={fonts.heading}>My Items</Text>
-        <TouchableOpacity style={styles.addBtn} onPress={() => setShowForm(!showForm)}>
-          <Text style={styles.addBtnText}>{showForm ? 'Cancel' : '+ Add'}</Text>
+        <View>
+          <Text style={fonts.heading}>My Items</Text>
+          <Text style={[fonts.muted, { marginTop: 2 }]}>
+            {items.length} item{items.length !== 1 ? 's' : ''} registered
+          </Text>
+        </View>
+        <TouchableOpacity
+          style={[styles.addBtn, showForm && styles.addBtnCancel]}
+          onPress={() => setShowForm(!showForm)}
+          activeOpacity={0.7}
+        >
+          <Text style={[styles.addBtnText, showForm && { color: colors.text.secondary }]}>
+            {showForm ? '✕ Cancel' : '➕ Add'}
+          </Text>
         </TouchableOpacity>
       </View>
 
       {showForm && (
         <View style={styles.form}>
-          <TextInput style={styles.input} placeholder="Item Name" value={itemName} onChangeText={setItemName} />
-          <TextInput style={styles.input} placeholder="Description" value={description} onChangeText={setDescription} />
-          <TouchableOpacity style={styles.photoBtn} onPress={pickImage}>
-            <Text style={styles.photoBtnText}>{photo ? 'Change Photo' : 'Add Photo'}</Text>
+          <Text style={[fonts.subheading, { marginBottom: spacing.md }]}>📦 Register New Item</Text>
+          <TextInput style={styles.input} placeholder="Item Name (e.g. MacBook)" value={itemName} onChangeText={setItemName} placeholderTextColor={colors.text.muted} />
+          <TextInput style={styles.input} placeholder="Description (optional)" value={description} onChangeText={setDescription} placeholderTextColor={colors.text.muted} />
+          <TouchableOpacity style={styles.photoBtn} onPress={pickImage} activeOpacity={0.7}>
+            <Text style={{ fontSize: 16 }}>📷</Text>
+            <Text style={styles.photoBtnText}>{photo ? 'Change Photo' : 'Choose Photo'}</Text>
           </TouchableOpacity>
           {photo && <Image source={{ uri: photo }} style={styles.preview} />}
-          <TouchableOpacity style={styles.submitBtn} onPress={handleCreate} disabled={submitting}>
-            <Text style={styles.submitBtnText}>{submitting ? 'Creating...' : 'Create Item'}</Text>
+          <TouchableOpacity
+            style={[styles.submitBtn, submitting && { opacity: 0.6 }]}
+            onPress={handleCreate}
+            disabled={submitting}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.submitBtnText}>{submitting ? 'Creating...' : 'Create & Generate QR'}</Text>
           </TouchableOpacity>
         </View>
       )}
 
+      {/* QR Success Modal — BUG FIX */}
+      <Modal visible={!!createdItem} transparent animationType="fade" onRequestClose={() => setCreatedItem(null)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={{ fontSize: 40, textAlign: 'center', marginBottom: spacing.md }}>🎉</Text>
+            <Text style={[fonts.subheading, { textAlign: 'center' }]}>Item Registered!</Text>
+            <Text style={[fonts.small, { textAlign: 'center', marginTop: spacing.sm, marginBottom: spacing.xl }]}>
+              {createdItem?.itemName} is now protected. Save this QR code.
+            </Text>
+            {createdItem && (
+              <View style={styles.qrContainer}>
+                <QRCode
+                  value={`${BASE_URL}/found/${createdItem.itemId}`}
+                  size={180}
+                  color="#1a1a2e"
+                  backgroundColor="transparent"
+                />
+              </View>
+            )}
+            <Text style={[fonts.muted, { textAlign: 'center', marginTop: spacing.md }]}>
+              Scan to return if found
+            </Text>
+            <TouchableOpacity
+              style={[styles.submitBtn, { marginTop: spacing.xl }]}
+              onPress={() => setCreatedItem(null)}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.submitBtnText}>Done</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* QR View Modal for existing items */}
+      <Modal visible={!!showQRFor} transparent animationType="fade" onRequestClose={() => setShowQRFor(null)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={[fonts.subheading, { textAlign: 'center', marginBottom: spacing.lg }]}>
+              QR Code: {showQRFor?.itemName}
+            </Text>
+            {showQRFor && (
+              <View style={styles.qrContainer}>
+                <QRCode
+                  value={`${BASE_URL}/found/${showQRFor.itemId}`}
+                  size={200}
+                  color="#1a1a2e"
+                  backgroundColor="transparent"
+                />
+              </View>
+            )}
+            <Text style={[fonts.muted, { textAlign: 'center', marginTop: spacing.md }]}>
+              Scan to report if found
+            </Text>
+            <TouchableOpacity
+              style={[styles.submitBtn, { marginTop: spacing.xl }]}
+              onPress={() => setShowQRFor(null)}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.submitBtnText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       <FlatList
         data={items}
         keyExtractor={(item) => item._id}
-        renderItem={({ item }) => <ItemCard item={item} onDelete={() => handleDelete(item.itemId)} />}
+        renderItem={({ item }) => (
+          <ItemCard
+            item={item}
+            onViewQR={() => setShowQRFor(item)}
+            onDelete={() => handleDelete(item.itemId)}
+          />
+        )}
         contentContainerStyle={styles.list}
         refreshing={loading}
         onRefresh={fetchItems}
+        showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+          !loading ? (
+            <View style={{ alignItems: 'center', paddingVertical: spacing.xxxl * 2 }}>
+              <Text style={{ fontSize: 48, marginBottom: spacing.md }}>📦</Text>
+              <Text style={[fonts.subheading, { color: colors.text.secondary }]}>No items yet</Text>
+              <Text style={[fonts.muted, { marginTop: spacing.xs }]}>Register your first item above</Text>
+            </View>
+          ) : null
+        }
       />
     </SafeAreaView>
   );
@@ -101,15 +209,19 @@ export default function ItemsScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: spacing.xxl, paddingBottom: spacing.md },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', padding: spacing.xxl, paddingBottom: spacing.md },
   addBtn: { backgroundColor: colors.primary, borderRadius: radius.sm, paddingHorizontal: spacing.lg, paddingVertical: spacing.sm },
+  addBtnCancel: { backgroundColor: colors.cream[200] },
   addBtnText: { color: colors.white, fontWeight: '600', fontSize: 14 },
-  form: { backgroundColor: colors.white, margin: spacing.xxl, marginTop: 0, borderRadius: radius.md, padding: spacing.xl },
-  input: { backgroundColor: colors.bg, borderRadius: radius.sm, padding: spacing.lg, marginBottom: spacing.md, borderWidth: 1, borderColor: colors.border },
-  photoBtn: { backgroundColor: colors.bg, borderRadius: radius.sm, padding: spacing.md, alignItems: 'center', marginBottom: spacing.sm },
-  photoBtnText: { color: colors.text.secondary, fontWeight: '500' },
+  form: { backgroundColor: colors.pastel.sageLight, margin: spacing.xxl, marginTop: 0, borderRadius: radius.lg, padding: spacing.xl },
+  input: { backgroundColor: colors.white, borderRadius: radius.sm, padding: spacing.lg, marginBottom: spacing.md, fontSize: 15, borderWidth: 1, borderColor: colors.border, color: colors.text.primary },
+  photoBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.sm, backgroundColor: colors.white, borderRadius: radius.sm, padding: spacing.md, marginBottom: spacing.sm, borderWidth: 2, borderColor: colors.border, borderStyle: 'dashed' },
+  photoBtnText: { color: colors.text.secondary, fontWeight: '500', fontSize: 14 },
   preview: { width: '100%', height: 150, borderRadius: radius.sm, marginBottom: spacing.md },
   submitBtn: { backgroundColor: colors.primary, borderRadius: radius.sm, padding: spacing.lg, alignItems: 'center' },
-  submitBtnText: { color: colors.white, fontWeight: '600', fontSize: 16 },
+  submitBtnText: { color: colors.white, fontWeight: '700', fontSize: 16 },
   list: { padding: spacing.xxl, paddingTop: 0, gap: spacing.md },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: 'center', alignItems: 'center', padding: spacing.xxl },
+  modalContent: { backgroundColor: colors.white, borderRadius: radius.xl, padding: spacing.xxl * 1.5, width: '100%', maxWidth: 360, ...shadows.elevated },
+  qrContainer: { alignItems: 'center', backgroundColor: colors.cream[50], borderRadius: radius.md, padding: spacing.xxl },
 });

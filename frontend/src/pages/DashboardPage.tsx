@@ -1,56 +1,114 @@
 import React from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useItems } from '../hooks/useItems';
+import { useReports } from '../hooks/useReports';
 import { useNotifications } from '../hooks/useNotifications';
-import { Card } from '../components/ui/Card';
+import { StatsGrid } from '../components/Dashboard/StatsGrid';
+import { QuickActions } from '../components/Dashboard/QuickActions';
+import { RecentItems } from '../components/Dashboard/RecentItems';
+import { ProgressCard } from '../components/Dashboard/ProgressCard';
+import { ActivityTimeline } from '../components/Dashboard/ActivityTimeline';
+import { QRCustomizer } from '../components/QRCustomizer';
 
 export function DashboardPage() {
   const { user } = useAuth();
   const { items } = useItems();
+  const { reports } = useReports();
   const { notifications, unreadCount, markAllRead } = useNotifications();
+  const [selectedQR, setSelectedQR] = React.useState<{ itemId: string; itemName: string; qrDataUrl?: string } | null>(null);
 
-  const safeCount = items.filter((i) => i.status === 'safe').length;
-  const foundCount = items.filter((i) => i.status === 'found').length;
+  // Get current hour for dynamic greeting
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-text-primary">Hello, {user?.name}</h1>
-        <p className="text-text-secondary">Welcome back to QRetrieve</p>
+    <div className="space-y-5 animate-slide-up">
+      {/* Greeting */}
+      <div className="relative">
+        <div className="absolute -right-4 -top-2 w-20 h-20 rounded-full bg-pastel-lavender opacity-20 animate-float" />
+        <div className="absolute right-8 top-6 w-12 h-12 rounded-full bg-pastel-sage opacity-15 animate-float" style={{ animationDelay: '1s' }} />
+        <h1 className="text-2xl font-extrabold text-text-primary">
+          {greeting}, {user?.name?.split(' ')[0]} 👋
+        </h1>
+        <p className="text-text-secondary text-sm mt-1">
+          Manage your items & recover lost belongings faster.
+        </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
-        <Card className="text-center !p-4">
-          <p className="text-2xl font-bold text-accent-green">{safeCount}</p>
-          <p className="text-xs text-text-muted">Safe</p>
-        </Card>
-        <Card className="text-center !p-4">
-          <p className="text-2xl font-bold text-accent-coral">{foundCount}</p>
-          <p className="text-xs text-text-muted">Found</p>
-        </Card>
-        <Card className="text-center !p-4">
-          <p className="text-2xl font-bold text-accent-blue">{items.length}</p>
-          <p className="text-xs text-text-muted">Total</p>
-        </Card>
-      </div>
+      {/* Status Row (mood-tracker style) */}
+      {items.length > 0 && (
+        <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+          {[
+            { emoji: '🛡️', label: 'All Safe', active: items.every(i => i.status === 'safe') },
+            { emoji: '📍', label: 'Found', active: items.some(i => i.status === 'found') },
+            { emoji: '🔔', label: 'Alerts', active: unreadCount > 0 },
+            { emoji: '✅', label: 'Good', active: !items.some(i => i.status === 'found') },
+          ].map((status) => (
+            <div
+              key={status.label}
+              className={`flex flex-col items-center gap-1 px-3 py-2 rounded-2xl transition-all flex-shrink-0
+                ${status.active
+                  ? 'bg-pastel-sage-light ring-2 ring-accent-green/30'
+                  : 'bg-cream-100'
+                }`}
+            >
+              <span className="text-xl">{status.emoji}</span>
+              <span className="text-[10px] font-medium text-text-secondary">{status.label}</span>
+            </div>
+          ))}
+        </div>
+      )}
 
+      {/* Stats Grid */}
+      <StatsGrid items={items} reports={reports} />
+
+      {/* Quick Actions */}
+      <QuickActions />
+
+      {/* Recent Items */}
+      <RecentItems
+        items={items}
+        onViewQR={(item) => setSelectedQR({ itemId: item.itemId, itemName: item.itemName, qrDataUrl: item.qrDataUrl })}
+      />
+
+      {/* QR Customizer overlay */}
+      {selectedQR && (
+        <div className="animate-scale-in">
+          <button
+            onClick={() => setSelectedQR(null)}
+            className="text-sm text-text-muted hover:text-text-primary transition-colors mb-2"
+          >
+            ← Close QR Preview
+          </button>
+          <QRCustomizer {...selectedQR} />
+        </div>
+      )}
+
+      {/* Progress Card */}
+      {items.length > 0 && <ProgressCard items={items} />}
+
+      {/* Activity Timeline */}
+      <ActivityTimeline reports={reports} notifications={notifications} />
+
+      {/* Notification Banner */}
       {unreadCount > 0 && (
-        <Card>
-          <div className="flex justify-between items-center mb-3">
-            <h2 className="font-semibold text-text-primary">Notifications ({unreadCount})</h2>
-            <button onClick={markAllRead} className="text-xs text-accent-coral hover:underline">
-              Mark all read
-            </button>
+        <div className="bg-pastel-peach-light rounded-3xl p-4 flex items-center gap-3 animate-slide-up">
+          <div className="w-10 h-10 bg-white/60 rounded-xl flex items-center justify-center flex-shrink-0">
+            <span className="text-lg">🔔</span>
           </div>
-          <div className="space-y-2">
-            {notifications.filter((n) => !n.read).slice(0, 5).map((n) => (
-              <div key={n._id} className="p-3 bg-beige-50 rounded-2xl">
-                <p className="text-sm font-medium text-text-primary">{n.title}</p>
-                <p className="text-xs text-text-secondary">{n.body}</p>
-              </div>
-            ))}
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-text-primary">
+              {unreadCount} unread notification{unreadCount > 1 ? 's' : ''}
+            </p>
+            <p className="text-xs text-text-secondary">Tap to view</p>
           </div>
-        </Card>
+          <button
+            onClick={markAllRead}
+            className="text-xs font-semibold text-accent-coral hover:underline"
+          >
+            Mark read
+          </button>
+        </div>
       )}
     </div>
   );

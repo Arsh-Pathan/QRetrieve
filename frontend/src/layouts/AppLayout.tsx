@@ -4,8 +4,8 @@ import { BottomNav } from '../components/BottomNav';
 
 export function AppLayout() {
   return (
-    <div className="min-h-screen bg-beige-50 pb-20">
-      <div className="max-w-lg mx-auto px-4 py-6">
+    <div className="min-h-screen bg-cream-50 pb-24">
+      <div className="max-w-lg mx-auto px-4 pt-6 pb-4">
         <Outlet />
       </div>
       <BottomNav />
