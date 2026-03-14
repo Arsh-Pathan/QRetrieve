@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, Alert, I
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import QRCode from 'react-native-qrcode-svg';
+import { Ionicons } from '@expo/vector-icons';
 import { api } from '../../services/api';
 import { BASE_URL } from '../../constants/config';
 import { colors, spacing, radius, fonts, shadows } from '../../constants/theme';
@@ -17,7 +18,7 @@ export default function ItemsScreen() {
   const [photo, setPhoto] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  // QR Success Modal state — BUG FIX
+  // QR Success Modal state
   const [createdItem, setCreatedItem] = useState<any>(null);
   const [showQRFor, setShowQRFor] = useState<any>(null);
 
@@ -52,7 +53,7 @@ export default function ItemsScreen() {
       }
       const newItem = await api.post<any>('/items', formData);
 
-      // BUG FIX: Show QR immediately after creation
+      // Show QR immediately after creation
       setCreatedItem(newItem);
 
       setItemName('');
@@ -79,8 +80,8 @@ export default function ItemsScreen() {
       <View style={styles.header}>
         <View>
           <Text style={fonts.heading}>My Items</Text>
-          <Text style={[fonts.muted, { marginTop: 2 }]}>
-            {items.length} item{items.length !== 1 ? 's' : ''} registered
+          <Text style={[fonts.muted, { marginTop: 2, fontWeight: '500' }]}>
+            {items.length} item{items.length !== 1 ? 's' : ''} protected
           </Text>
         </View>
         <TouchableOpacity
@@ -88,19 +89,25 @@ export default function ItemsScreen() {
           onPress={() => setShowForm(!showForm)}
           activeOpacity={0.7}
         >
-          <Text style={[styles.addBtnText, showForm && { color: colors.text.secondary }]}>
-            {showForm ? '✕ Cancel' : '➕ Add'}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <Ionicons name={showForm ? 'close' : 'add'} size={20} color={showForm ? colors.text.secondary : colors.white} />
+            <Text style={[styles.addBtnText, showForm && { color: colors.text.secondary }]}>
+              {showForm ? 'Cancel' : 'Add'}
+            </Text>
+          </View>
         </TouchableOpacity>
       </View>
 
       {showForm && (
         <View style={styles.form}>
-          <Text style={[fonts.subheading, { marginBottom: spacing.md }]}>📦 Register New Item</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: spacing.md }}>
+            <Ionicons name="cube" size={20} color={colors.primary} />
+            <Text style={fonts.subheading}>Register New Item</Text>
+          </View>
           <TextInput style={styles.input} placeholder="Item Name (e.g. MacBook)" value={itemName} onChangeText={setItemName} placeholderTextColor={colors.text.muted} />
           <TextInput style={styles.input} placeholder="Description (optional)" value={description} onChangeText={setDescription} placeholderTextColor={colors.text.muted} />
           <TouchableOpacity style={styles.photoBtn} onPress={pickImage} activeOpacity={0.7}>
-            <Text style={{ fontSize: 16 }}>📷</Text>
+            <Ionicons name="camera-outline" size={20} color={colors.text.muted} />
             <Text style={styles.photoBtnText}>{photo ? 'Change Photo' : 'Choose Photo'}</Text>
           </TouchableOpacity>
           {photo && <Image source={{ uri: photo }} style={styles.preview} />}
@@ -110,16 +117,21 @@ export default function ItemsScreen() {
             disabled={submitting}
             activeOpacity={0.7}
           >
-            <Text style={styles.submitBtnText}>{submitting ? 'Creating...' : 'Create & Generate QR'}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <Ionicons name="qr-code" size={18} color={colors.white} />
+                <Text style={styles.submitBtnText}>{submitting ? 'Creating...' : 'Create & Generate QR'}</Text>
+            </View>
           </TouchableOpacity>
         </View>
       )}
 
-      {/* QR Success Modal — BUG FIX */}
+      {/* QR Success Modal */}
       <Modal visible={!!createdItem} transparent animationType="fade" onRequestClose={() => setCreatedItem(null)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={{ fontSize: 40, textAlign: 'center', marginBottom: spacing.md }}>🎉</Text>
+            <View style={styles.successBadge}>
+                <Ionicons name="checkmark-circle" size={48} color={colors.accent.green} />
+            </View>
             <Text style={[fonts.subheading, { textAlign: 'center' }]}>Item Registered!</Text>
             <Text style={[fonts.small, { textAlign: 'center', marginTop: spacing.sm, marginBottom: spacing.xl }]}>
               {createdItem?.itemName} is now protected. Save this QR code.
@@ -134,7 +146,7 @@ export default function ItemsScreen() {
                 />
               </View>
             )}
-            <Text style={[fonts.muted, { textAlign: 'center', marginTop: spacing.md }]}>
+            <Text style={[fonts.muted, { textAlign: 'center', marginTop: spacing.md, fontSize: 11 }]}>
               Scan to return if found
             </Text>
             <TouchableOpacity
@@ -165,8 +177,8 @@ export default function ItemsScreen() {
                 />
               </View>
             )}
-            <Text style={[fonts.muted, { textAlign: 'center', marginTop: spacing.md }]}>
-              Scan to report if found
+            <Text style={[fonts.muted, { textAlign: 'center', marginTop: spacing.md, fontSize: 11 }]}>
+               Scan locally to test your item's landing page
             </Text>
             <TouchableOpacity
               style={[styles.submitBtn, { marginTop: spacing.xl }]}
@@ -196,7 +208,9 @@ export default function ItemsScreen() {
         ListEmptyComponent={
           !loading ? (
             <View style={{ alignItems: 'center', paddingVertical: spacing.xxxl * 2 }}>
-              <Text style={{ fontSize: 48, marginBottom: spacing.md }}>📦</Text>
+              <View style={styles.emptyIcon}>
+                <Ionicons name="cube-outline" size={64} color={colors.text.muted} />
+              </View>
               <Text style={[fonts.subheading, { color: colors.text.secondary }]}>No items yet</Text>
               <Text style={[fonts.muted, { marginTop: spacing.xs }]}>Register your first item above</Text>
             </View>
@@ -212,8 +226,8 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', padding: spacing.xxl, paddingBottom: spacing.md },
   addBtn: { backgroundColor: colors.primary, borderRadius: radius.sm, paddingHorizontal: spacing.lg, paddingVertical: spacing.sm },
   addBtnCancel: { backgroundColor: colors.cream[200] },
-  addBtnText: { color: colors.white, fontWeight: '600', fontSize: 14 },
-  form: { backgroundColor: colors.pastel.sageLight, margin: spacing.xxl, marginTop: 0, borderRadius: radius.lg, padding: spacing.xl },
+  addBtnText: { color: colors.white, fontWeight: '700', fontSize: 14 },
+  form: { backgroundColor: colors.pastel.lavenderLight, margin: spacing.xxl, marginTop: 0, borderRadius: radius.lg, padding: spacing.xl, ...shadows.soft },
   input: { backgroundColor: colors.white, borderRadius: radius.sm, padding: spacing.lg, marginBottom: spacing.md, fontSize: 15, borderWidth: 1, borderColor: colors.border, color: colors.text.primary },
   photoBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.sm, backgroundColor: colors.white, borderRadius: radius.sm, padding: spacing.md, marginBottom: spacing.sm, borderWidth: 2, borderColor: colors.border, borderStyle: 'dashed' },
   photoBtnText: { color: colors.text.secondary, fontWeight: '500', fontSize: 14 },
@@ -221,7 +235,10 @@ const styles = StyleSheet.create({
   submitBtn: { backgroundColor: colors.primary, borderRadius: radius.sm, padding: spacing.lg, alignItems: 'center' },
   submitBtnText: { color: colors.white, fontWeight: '700', fontSize: 16 },
   list: { padding: spacing.xxl, paddingTop: 0, gap: spacing.md },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: 'center', alignItems: 'center', padding: spacing.xxl },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center', padding: spacing.xxl },
   modalContent: { backgroundColor: colors.white, borderRadius: radius.xl, padding: spacing.xxl * 1.5, width: '100%', maxWidth: 360, ...shadows.elevated },
   qrContainer: { alignItems: 'center', backgroundColor: colors.cream[50], borderRadius: radius.md, padding: spacing.xxl },
+  successBadge: { alignSelf: 'center', marginBottom: spacing.md },
+  emptyIcon: { marginBottom: spacing.lg, opacity: 0.5 },
 });
+

@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, radius, fonts, shadows } from '../../constants/theme';
 import { BASE_URL } from '../../constants/config';
 
@@ -29,10 +30,12 @@ export default function ScannerScreen() {
   if (!permission.granted) {
     return (
       <View style={styles.center}>
-        <Text style={{ fontSize: 48, marginBottom: spacing.xl }}>📷</Text>
+        <View style={styles.iconCircle}>
+          <Ionicons name="camera" size={48} color={colors.primary} />
+        </View>
         <Text style={[fonts.subheading, { textAlign: 'center' }]}>Camera Permission</Text>
-        <Text style={[fonts.small, { textAlign: 'center', marginTop: spacing.sm, marginBottom: spacing.xl }]}>
-          Camera access is needed to scan QR codes
+        <Text style={[fonts.small, { textAlign: 'center', marginTop: spacing.sm, marginBottom: spacing.xl, color: colors.text.muted }]}>
+          Camera access is needed to scan QR codes and return lost items.
         </Text>
         <TouchableOpacity style={styles.btn} onPress={requestPermission} activeOpacity={0.7}>
           <Text style={styles.btnText}>Grant Permission</Text>
@@ -61,7 +64,10 @@ export default function ScannerScreen() {
       {/* Bottom bar */}
       <View style={styles.bottomBar}>
         <View style={styles.bottomContent}>
-          <Text style={styles.instructions}>Point at a QRetrieve QR code</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: spacing.md }}>
+            <Ionicons name="qr-code" size={18} color={colors.white} />
+            <Text style={styles.instructions}>Point at a QRetrieve QR code</Text>
+          </View>
           {scanned && (
             <TouchableOpacity style={styles.btn} onPress={() => setScanned(false)} activeOpacity={0.7}>
               <Text style={styles.btnText}>Scan Again</Text>
@@ -76,28 +82,34 @@ export default function ScannerScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: spacing.xxl * 2, backgroundColor: colors.bg },
+  iconCircle: { width: 100, height: 100, borderRadius: 50, backgroundColor: colors.pastel.lavenderLight, justifyContent: 'center', alignItems: 'center', marginBottom: spacing.xl },
   overlay: { ...StyleSheet.absoluteFillObject, justifyContent: 'center', alignItems: 'center' },
   scanBox: {
     width: 260, height: 260,
-    borderRadius: radius.lg,
+    borderRadius: radius.md,
     position: 'relative',
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
   },
   corner: {
     position: 'absolute',
     width: 40, height: 40,
     borderColor: colors.primary,
   },
-  cornerTL: { top: 0, left: 0, borderTopWidth: 4, borderLeftWidth: 4, borderTopLeftRadius: radius.md },
-  cornerTR: { top: 0, right: 0, borderTopWidth: 4, borderRightWidth: 4, borderTopRightRadius: radius.md },
-  cornerBL: { bottom: 0, left: 0, borderBottomWidth: 4, borderLeftWidth: 4, borderBottomLeftRadius: radius.md },
-  cornerBR: { bottom: 0, right: 0, borderBottomWidth: 4, borderRightWidth: 4, borderBottomRightRadius: radius.md },
+  cornerTL: { top: -2, left: -2, borderTopWidth: 6, borderLeftWidth: 6, borderTopLeftRadius: radius.md },
+  cornerTR: { top: -2, right: -2, borderTopWidth: 6, borderRightWidth: 6, borderTopRightRadius: radius.md },
+  cornerBL: { bottom: -2, left: -2, borderBottomWidth: 6, borderLeftWidth: 6, borderBottomLeftRadius: radius.md },
+  cornerBR: { bottom: -2, right: -2, borderBottomWidth: 6, borderRightWidth: 6, borderBottomRightRadius: radius.md },
   bottomBar: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.6)',
     paddingBottom: 40,
+    borderTopLeftRadius: radius.xl,
+    borderTopRightRadius: radius.xl,
   },
   bottomContent: { alignItems: 'center', paddingVertical: spacing.xl },
-  instructions: { color: colors.white, fontSize: 15, fontWeight: '500', marginBottom: spacing.lg },
-  btn: { backgroundColor: colors.primary, borderRadius: radius.sm, paddingHorizontal: spacing.xxl, paddingVertical: spacing.md },
+  instructions: { color: colors.white, fontSize: 16, fontWeight: '600' },
+  btn: { backgroundColor: colors.primary, borderRadius: radius.sm, paddingHorizontal: spacing.xxl, paddingVertical: spacing.md, ...shadows.soft },
   btnText: { color: colors.white, fontWeight: '700', fontSize: 16 },
 });

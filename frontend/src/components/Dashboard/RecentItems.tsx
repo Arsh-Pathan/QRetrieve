@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../ui/Card';
+import { IconPackage, IconSmartphone, IconQrCode } from '../ui/Symbols';
 
 interface RecentItemsProps {
   items: any[];
@@ -20,7 +21,9 @@ export function RecentItems({ items, onViewQR }: RecentItemsProps) {
   if (recent.length === 0) {
     return (
       <Card className="text-center !py-10">
-        <div className="text-4xl mb-3 animate-float">📦</div>
+        <div className="flex justify-center mb-3 animate-float">
+          <IconPackage size={48} className="text-accent-lavender opacity-40" />
+        </div>
         <p className="text-text-secondary font-medium">No items registered yet</p>
         <p className="text-text-muted text-sm mt-1">Add your first item to get started</p>
         <button
@@ -38,7 +41,7 @@ export function RecentItems({ items, onViewQR }: RecentItemsProps) {
     <div>
       <div className="flex justify-between items-center mb-3">
         <h2 className="text-lg font-bold text-text-primary flex items-center gap-2">
-          <span>📦</span> Your Items
+          <IconPackage className="text-accent-lavender" /> Your Items
         </h2>
         <button
           onClick={() => navigate('/items')}
@@ -59,8 +62,8 @@ export function RecentItems({ items, onViewQR }: RecentItemsProps) {
                   className="w-12 h-12 rounded-2xl object-cover flex-shrink-0"
                 />
               ) : (
-                <div className="w-12 h-12 rounded-2xl bg-pastel-lavender-light flex items-center justify-center flex-shrink-0">
-                  <span className="text-xl">📱</span>
+                <div className="w-12 h-12 rounded-2xl bg-pastel-lavender-light flex items-center justify-center flex-shrink-0 text-accent-purple opacity-70">
+                  <IconSmartphone size={24} />
                 </div>
               )}
               <div className="flex-1 min-w-0">
@@ -77,10 +80,10 @@ export function RecentItems({ items, onViewQR }: RecentItemsProps) {
               <button
                 onClick={(e) => { e.stopPropagation(); onViewQR(item); }}
                 className="flex-shrink-0 w-9 h-9 rounded-xl bg-pastel-lavender-light 
-                  flex items-center justify-center hover:bg-pastel-lavender transition-colors"
+                  flex items-center justify-center hover:bg-pastel-lavender transition-colors text-accent-purple"
                 title="View QR Code"
               >
-                <span className="text-sm">⊞</span>
+                <IconQrCode size={18} />
               </button>
             </Card>
           );

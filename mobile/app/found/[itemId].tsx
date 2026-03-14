@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView,
 import { useLocalSearchParams } from 'expo-router';
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
+import { Ionicons } from '@expo/vector-icons';
 import { API_BASE } from '../../constants/config';
 import { colors, spacing, radius, fonts, shadows } from '../../constants/theme';
 
@@ -75,7 +76,9 @@ export default function FoundItemScreen() {
   if (error) {
     return (
       <View style={styles.center}>
-        <Text style={{ fontSize: 48, marginBottom: spacing.md }}>😕</Text>
+        <View style={styles.errorIcon}>
+          <Ionicons name="alert-circle" size={48} color={colors.accent.red} />
+        </View>
         <Text style={[fonts.subheading, { textAlign: 'center' }]}>Oops!</Text>
         <Text style={[fonts.small, { textAlign: 'center', marginTop: spacing.sm }]}>{error}</Text>
       </View>
@@ -85,13 +88,18 @@ export default function FoundItemScreen() {
   if (submitted) {
     return (
       <View style={styles.center}>
-        <Text style={{ fontSize: 48, marginBottom: spacing.md }}>🎉</Text>
+        <View style={styles.successIcon}>
+          <Ionicons name="happy" size={64} color={colors.accent.green} />
+        </View>
         <Text style={[fonts.heading, { textAlign: 'center' }]}>Thank You!</Text>
         <Text style={[fonts.small, { textAlign: 'center', marginTop: spacing.sm }]}>
           The owner has been notified instantly. They'll reach out to arrange pickup.
         </Text>
         <View style={styles.successBanner}>
-          <Text style={styles.successTitle}>Your good deed matters!</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+            <Ionicons name="checkmark-circle" size={18} color="#2e7d32" />
+            <Text style={styles.successTitle}>Your good deed matters!</Text>
+          </View>
           <Text style={styles.successSub}>The owner will be incredibly grateful.</Text>
         </View>
       </View>
@@ -110,7 +118,9 @@ export default function FoundItemScreen() {
     <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
       {/* Header */}
       <View style={styles.headerArea}>
-        <Text style={{ fontSize: 48, textAlign: 'center', marginBottom: spacing.md }}>📦</Text>
+        <View style={styles.headerCircle}>
+          <Ionicons name="cube" size={42} color={colors.primary} />
+        </View>
         <Text style={[fonts.heading, { textAlign: 'center' }]}>Someone Lost This Item</Text>
         <Text style={[fonts.small, { textAlign: 'center', marginTop: spacing.sm }]}>
           Thanks for scanning! Help return it by filling out a quick form.
@@ -119,9 +129,14 @@ export default function FoundItemScreen() {
 
       {/* Trust badges */}
       <View style={styles.trustRow}>
-        {['🛡️ Secure', '🔒 Private', '⚡ Instant'].map((badge) => (
-          <View key={badge} style={styles.trustBadge}>
-            <Text style={styles.trustText}>{badge}</Text>
+        {[
+          { icon: 'shield-checkmark', label: 'Secure', color: colors.accent.green },
+          { icon: 'lock-closed', label: 'Private', color: colors.accent.blue },
+          { icon: 'flash', label: 'Instant', color: colors.accent.yellow }
+        ].map((badge) => (
+          <View key={badge.label} style={styles.trustBadge}>
+            <Ionicons name={badge.icon as any} size={14} color={badge.color} />
+            <Text style={styles.trustText}>{badge.label}</Text>
           </View>
         ))}
       </View>
@@ -133,14 +148,14 @@ export default function FoundItemScreen() {
             <Image source={{ uri: item.photoUrl }} style={styles.itemPhoto} />
           ) : (
             <View style={styles.itemPlaceholder}>
-              <Text style={{ fontSize: 28 }}>📦</Text>
+              <Ionicons name="cube-outline" size={32} color={colors.primary} />
             </View>
           )}
           <View style={{ flex: 1 }}>
-            <Text style={fonts.caption}>FOUND ITEM</Text>
+            <Text style={[fonts.caption, { color: colors.primary, fontWeight: '700' }]}>FOUND ITEM</Text>
             <Text style={[fonts.subheading, { marginTop: 2 }]}>{item.itemName}</Text>
             {item.description && (
-              <Text style={[fonts.small, { marginTop: spacing.xs }]}>{item.description}</Text>
+              <Text style={[fonts.small, { marginTop: spacing.xs }]} numberOfLines={2}>{item.description}</Text>
             )}
           </View>
         </View>
@@ -148,7 +163,10 @@ export default function FoundItemScreen() {
 
       {/* Form */}
       <View style={styles.card}>
-        <Text style={[fonts.subheading, { marginBottom: 2 }]}>📝 Quick Report</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: 2 }}>
+          <Ionicons name="document-text" size={18} color={colors.accent.coral} />
+          <Text style={fonts.subheading}>Quick Report</Text>
+        </View>
         <Text style={[fonts.muted, { marginBottom: spacing.lg }]}>Takes less than 30 seconds</Text>
 
         <TextInput
@@ -174,7 +192,7 @@ export default function FoundItemScreen() {
             placeholderTextColor={colors.text.muted}
           />
           <TouchableOpacity style={styles.gpsBtn} onPress={getLocation} activeOpacity={0.7}>
-            <Text style={{ color: colors.white, fontWeight: '700', fontSize: 13 }}>📍</Text>
+            <Ionicons name="location" size={16} color={colors.white} />
           </TouchableOpacity>
         </View>
         <TextInput
@@ -186,7 +204,7 @@ export default function FoundItemScreen() {
           placeholderTextColor={colors.text.muted}
         />
         <TouchableOpacity style={styles.cameraBtn} onPress={pickImage} activeOpacity={0.7}>
-          <Text style={{ fontSize: 16 }}>📷</Text>
+          <Ionicons name="camera" size={20} color={colors.text.muted} />
           <Text style={{ color: colors.text.secondary, fontWeight: '500' }}>
             {photo ? 'Change Photo' : 'Take Photo'}
           </Text>
@@ -199,7 +217,10 @@ export default function FoundItemScreen() {
           disabled={submitting}
           activeOpacity={0.7}
         >
-          <Text style={styles.submitText}>{submitting ? 'Submitting...' : '🎉 Report Item Found'}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <Ionicons name="checkmark" size={20} color={colors.white} />
+            <Text style={styles.submitText}>{submitting ? 'Submitting...' : 'Report Item Found'}</Text>
+          </View>
         </TouchableOpacity>
 
         <Text style={[fonts.caption, { textAlign: 'center', marginTop: spacing.md }]}>
@@ -213,9 +234,12 @@ export default function FoundItemScreen() {
 const styles = StyleSheet.create({
   container: { padding: spacing.xxl, backgroundColor: colors.bg, paddingBottom: spacing.xxxl * 2 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: spacing.xxl * 2, backgroundColor: colors.bg },
-  headerArea: { paddingVertical: spacing.xxl, paddingHorizontal: spacing.lg, backgroundColor: colors.pastel.lavenderLight, borderRadius: radius.xl, marginBottom: spacing.lg },
+  errorIcon: { width: 80, height: 80, borderRadius: radius.xl, backgroundColor: colors.pastel.peachLight, justifyContent: 'center', alignItems: 'center', marginBottom: spacing.lg },
+  successIcon: { marginBottom: spacing.lg },
+  headerArea: { paddingVertical: spacing.xxl, paddingHorizontal: spacing.lg, backgroundColor: colors.pastel.lavenderLight, borderRadius: radius.xl, marginBottom: spacing.lg, alignItems: 'center' },
+  headerCircle: { width: 80, height: 80, borderRadius: 40, backgroundColor: colors.white, justifyContent: 'center', alignItems: 'center', marginBottom: spacing.md, ...shadows.soft },
   trustRow: { flexDirection: 'row', justifyContent: 'center', gap: spacing.sm, marginBottom: spacing.lg },
-  trustBadge: { backgroundColor: colors.white, borderRadius: radius.full, paddingHorizontal: spacing.md, paddingVertical: spacing.sm, ...shadows.soft },
+  trustBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.white, borderRadius: radius.full, paddingHorizontal: spacing.md, paddingVertical: spacing.sm, ...shadows.soft },
   trustText: { fontSize: 12, fontWeight: '600', color: colors.text.secondary },
   card: { backgroundColor: colors.white, borderRadius: radius.lg, padding: spacing.xxl, marginBottom: spacing.lg, ...shadows.card },
   itemRow: { flexDirection: 'row', gap: spacing.lg, alignItems: 'center' },
@@ -227,7 +251,8 @@ const styles = StyleSheet.create({
   preview: { width: '100%', height: 150, borderRadius: radius.sm, marginBottom: spacing.md },
   submitBtn: { backgroundColor: colors.primary, borderRadius: radius.sm, padding: spacing.lg + 2, alignItems: 'center' },
   submitText: { color: colors.white, fontWeight: '700', fontSize: 16 },
-  successBanner: { backgroundColor: colors.pastel.sageLight, borderRadius: radius.md, padding: spacing.lg, marginTop: spacing.xxl },
+  successBanner: { backgroundColor: colors.pastel.sageLight, borderRadius: radius.md, padding: spacing.lg, marginTop: spacing.xxl, width: '100%' },
   successTitle: { fontWeight: '700', color: '#2e7d32', fontSize: 14 },
-  successSub: { fontSize: 12, color: '#2e7d32', opacity: 0.8, marginTop: 2 },
+  successSub: { fontSize: 12, color: '#2e7d32', opacity: 0.8, marginTop: 2, paddingLeft: 24 },
 });
+

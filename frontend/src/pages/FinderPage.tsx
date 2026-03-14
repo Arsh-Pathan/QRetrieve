@@ -5,6 +5,20 @@ import { Card } from '../components/ui/Card';
 import { Input, TextArea } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { FoundItemIllustration, ShieldIllustration, SuccessIllustration } from '../components/illustrations/SVGIllustrations';
+import { 
+  IconAlertCircle, 
+  IconCheckCircle, 
+  IconLock, 
+  IconZap, 
+  IconPackage, 
+  IconClipboard, 
+  IconUser, 
+  IconMail, 
+  IconMapPin, 
+  IconCamera,
+  IconCheck,
+  IconSmile
+} from '../components/ui/Symbols';
 
 interface ItemInfo {
   itemId: string;
@@ -84,9 +98,20 @@ export function FinderPage() {
     return (
       <div className="min-h-screen bg-cream-50 flex items-center justify-center p-4">
         <Card className="text-center max-w-md animate-scale-in">
-          <div className="text-5xl mb-4">😕</div>
+          <div className="flex justify-center mb-4">
+            <div className="p-4 bg-pastel-peach-light rounded-3xl text-accent-red">
+              <IconAlertCircle size={48} />
+            </div>
+          </div>
           <h2 className="text-xl font-bold text-text-primary mb-2">Oops!</h2>
           <p className="text-text-secondary">{error}</p>
+          <Button 
+            className="mt-6 w-full" 
+            variant="pastel" 
+            onClick={() => setError('')}
+          >
+            Try Again
+          </Button>
         </Card>
       </div>
     );
@@ -100,13 +125,18 @@ export function FinderPage() {
           <div className="flex justify-center animate-bounce-soft">
             <SuccessIllustration size={120} />
           </div>
-          <h2 className="text-2xl font-extrabold text-text-primary">Thank You! 🎉</h2>
+          <h2 className="text-2xl font-extrabold text-text-primary flex items-center justify-center gap-2">
+            Thank You! <IconSmile className="text-accent-yellow" size={28} />
+          </h2>
           <p className="text-text-secondary">
             The owner has been notified instantly. They'll reach out to arrange pickup.
           </p>
           <div className="bg-pastel-sage-light rounded-2xl p-4 text-sm text-green-700">
-            <p className="font-semibold">Your good deed matters!</p>
-            <p className="text-xs mt-1 opacity-80">The owner will be incredibly grateful.</p>
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <IconCheckCircle size={18} />
+              <p className="font-semibold">Your good deed matters!</p>
+            </div>
+            <p className="text-xs opacity-80">The owner will be incredibly grateful.</p>
           </div>
         </Card>
       </div>
@@ -128,7 +158,7 @@ export function FinderPage() {
   return (
     <div className="min-h-screen bg-cream-50">
       {/* Header gradient */}
-      <div className="bg-gradient-to-b from-pastel-lavender-light to-cream-50 pt-8 pb-4 px-4">
+      <div className="bg-gradient-to-b from-pastel-lavender-light/50 to-cream-50 pt-8 pb-4 px-4">
         <div className="max-w-md mx-auto text-center">
           <div className="flex justify-center mb-4 animate-float">
             <FoundItemIllustration size={120} />
@@ -146,12 +176,12 @@ export function FinderPage() {
         {/* Trust badges */}
         <div className="flex gap-3 justify-center">
           {[
-            { icon: <ShieldIllustration size={28} />, label: 'Secure' },
-            { icon: '🔒', label: 'Private' },
-            { icon: '⚡', label: 'Instant' },
+            { icon: <ShieldIllustration size={28} />, label: 'Secure', bg: 'bg-white' },
+            { icon: <IconLock size={16} className="text-accent-blue" />, label: 'Private', bg: 'bg-pastel-blue-light' },
+            { icon: <IconZap size={16} className="text-accent-yellow" />, label: 'Instant', bg: 'bg-pastel-yellow-light' },
           ].map((badge) => (
-            <div key={badge.label} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white shadow-soft text-xs">
-              {typeof badge.icon === 'string' ? <span>{badge.icon}</span> : badge.icon}
+            <div key={badge.label} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${badge.bg} shadow-soft text-xs`}>
+              {badge.icon}
               <span className="font-medium text-text-secondary">{badge.label}</span>
             </div>
           ))}
@@ -163,14 +193,14 @@ export function FinderPage() {
             {item.photoUrl ? (
               <img src={item.photoUrl} alt={item.itemName} className="w-20 h-20 rounded-2xl object-cover" />
             ) : (
-              <div className="w-20 h-20 rounded-2xl bg-pastel-lavender-light flex items-center justify-center">
-                <span className="text-3xl">📦</span>
+              <div className="w-20 h-20 rounded-2xl bg-pastel-lavender-light flex items-center justify-center text-accent-purple">
+                <IconPackage size={32} />
               </div>
             )}
             <div>
-              <p className="text-xs text-text-muted font-medium mb-0.5">FOUND ITEM</p>
+              <p className="text-[10px] tracking-wider text-accent-purple font-bold mb-0.5 uppercase">Found Item</p>
               <h2 className="text-lg font-bold text-text-primary">{item.itemName}</h2>
-              {item.description && <p className="text-sm text-text-secondary mt-0.5">{item.description}</p>}
+              {item.description && <p className="text-sm text-text-secondary mt-0.5 line-clamp-2">{item.description}</p>}
             </div>
           </div>
         </Card>
@@ -178,25 +208,25 @@ export function FinderPage() {
         {/* Report form */}
         <Card>
           <h3 className="font-bold text-text-primary mb-1 flex items-center gap-2">
-            <span>📝</span> Quick Report
+            <IconClipboard size={18} className="text-accent-coral" /> Quick Report
           </h3>
-          <p className="text-xs text-text-muted mb-4">Takes less than 30 seconds</p>
+          <p className="text-xs text-text-muted mb-4 font-medium">Takes less than 30 seconds</p>
 
-          <form onSubmit={handleSubmit} className="space-y-3">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <Input
               label="Your Name"
               value={form.finderName}
               onChange={update('finderName')}
               required
               placeholder="What should the owner call you?"
-              icon={<span className="text-sm">👤</span>}
+              icon={<IconUser size={16} className="text-text-muted" />}
             />
             <Input
               label="Contact (optional)"
               value={form.finderContact}
               onChange={update('finderContact')}
               placeholder="Email or phone"
-              icon={<span className="text-sm">📧</span>}
+              icon={<IconMail size={16} className="text-text-muted" />}
             />
             <div className="flex gap-2 items-end">
               <div className="flex-1">
@@ -206,7 +236,7 @@ export function FinderPage() {
                   onChange={update('finderLocation')}
                   required
                   placeholder="Where did you find it?"
-                  icon={<span className="text-sm">📍</span>}
+                  icon={<IconMapPin size={16} className="text-text-muted" />}
                 />
               </div>
               <Button
@@ -216,7 +246,7 @@ export function FinderPage() {
                 onClick={getLocation}
                 disabled={locating}
                 loading={locating}
-                className="mb-0.5"
+                className="mb-0.5 h-[42px] px-4"
               >
                 GPS
               </Button>
@@ -227,13 +257,14 @@ export function FinderPage() {
               value={form.message}
               onChange={update('message')}
               placeholder="Any details about the item's condition..."
+              rows={2}
             />
 
             <div>
-              <label className="text-sm font-medium text-text-secondary">Photo of item</label>
-              <label className="mt-1.5 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-cream-50 border-2 border-dashed border-cream-300 cursor-pointer hover:border-accent-purple transition-all">
-                <span>📷</span>
-                <span className="text-sm text-text-secondary">
+              <label className="text-sm font-medium text-text-secondary pl-1">Photo of item</label>
+              <label className="mt-2 flex items-center justify-center gap-3 px-4 py-4 rounded-2xl bg-cream-50 border-2 border-dashed border-cream-300 cursor-pointer hover:border-accent-purple hover:bg-white transition-all group">
+                <IconCamera size={24} className="text-text-muted group-hover:text-accent-purple" />
+                <span className="text-sm text-text-secondary font-medium group-hover:text-text-primary">
                   {photo ? photo.name : 'Take or choose a photo'}
                 </span>
                 <input
@@ -246,11 +277,11 @@ export function FinderPage() {
               </label>
             </div>
 
-            <Button type="submit" className="w-full !py-3.5" loading={submitting}>
-              🎉 Report Item Found
+            <Button type="submit" className="w-full !py-4 text-base shadow-glow-purple" loading={submitting}>
+              <IconCheck className="mr-2" size={20} /> Report Item Found
             </Button>
 
-            <p className="text-[10px] text-text-muted text-center">
+            <p className="text-[10px] text-text-muted text-center font-medium">
               Your information is only shared with the item's owner.
             </p>
           </form>

@@ -7,6 +7,7 @@ import { QRSuccessModal } from '../components/QRSuccessModal';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
+import { IconPackage, IconPlus, IconCamera, IconX } from '../components/ui/Symbols';
 
 export function ItemsPage() {
   const { items, loading, refresh } = useItems();
@@ -73,10 +74,18 @@ export function ItemsPage() {
         <Button
           size="sm"
           onClick={() => setShowForm(!showForm)}
-          icon={showForm ? undefined : <span>➕</span>}
           variant={showForm ? 'ghost' : 'primary'}
+          className="flex items-center gap-1"
         >
-          {showForm ? '✕ Cancel' : 'Add Item'}
+          {showForm ? (
+            <>
+              <IconX size={16} /> Cancel
+            </>
+          ) : (
+            <>
+              <IconPlus size={16} /> Add Item
+            </>
+          )}
         </Button>
       </div>
 
@@ -84,7 +93,7 @@ export function ItemsPage() {
       {showForm && (
         <Card className="animate-slide-down" pastel="sage">
           <h3 className="font-semibold text-text-primary mb-3 flex items-center gap-2">
-            <span>📦</span> Register New Item
+            <IconPackage size={20} className="text-accent-green" /> Register New Item
           </h3>
           <form onSubmit={handleCreate} className="space-y-3">
             <Input
@@ -104,7 +113,7 @@ export function ItemsPage() {
               <label className="text-sm font-medium text-text-secondary">Photo</label>
               <div className="mt-1.5">
                 <label className="flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-white border-2 border-dashed border-cream-300 cursor-pointer hover:border-accent-purple hover:bg-pastel-lavender-light/30 transition-all">
-                  <span>📷</span>
+                  <IconCamera size={18} className="text-text-muted" />
                   <span className="text-sm text-text-secondary">
                     {photo ? photo.name : 'Choose a photo'}
                   </span>
@@ -156,7 +165,9 @@ export function ItemsPage() {
         </div>
       ) : items.length === 0 ? (
         <Card className="text-center !py-12">
-          <div className="text-5xl mb-4 animate-float">📦</div>
+          <div className="flex justify-center mb-4 animate-float">
+            <IconPackage size={64} className="text-accent-lavender opacity-30" />
+          </div>
           <p className="text-text-secondary font-semibold text-lg">No items yet</p>
           <p className="text-text-muted text-sm mt-1 mb-4">Register your first item to get its QR code</p>
           <Button size="sm" onClick={() => setShowForm(true)}>

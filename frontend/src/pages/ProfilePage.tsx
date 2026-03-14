@@ -4,6 +4,7 @@ import { useItems } from '../hooks/useItems';
 import { useReports } from '../hooks/useReports';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
+import { IconMail, IconSmartphone, IconClock, IconLogout } from '../components/ui/Symbols';
 
 export function ProfilePage() {
   const { user, logout } = useAuth();
@@ -19,14 +20,16 @@ export function ProfilePage() {
         <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-pastel-lavender opacity-20" />
         <div className="relative z-10 flex items-center gap-4">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent-purple to-accent-coral 
-            flex items-center justify-center text-white text-2xl font-bold">
-            {user?.name?.charAt(0).toUpperCase()}
+            flex items-center justify-center text-white text-2xl font-bold uppercase transition-transform hover:scale-105">
+            {user?.name?.charAt(0)}
           </div>
           <div>
             <h2 className="font-bold text-text-primary text-lg">{user?.name}</h2>
             <p className="text-sm text-text-muted">{user?.email}</p>
             {user?.phone && (
-              <p className="text-xs text-text-muted mt-0.5">📱 {user.phone}</p>
+              <p className="text-xs text-text-muted mt-0.5 flex items-center gap-1">
+                <IconSmartphone size={12} /> {user.phone}
+              </p>
             )}
           </div>
         </div>
@@ -55,12 +58,14 @@ export function ProfilePage() {
         <h3 className="font-bold text-text-primary mb-3">Account</h3>
         <div className="space-y-2">
           {[
-            { icon: '📧', label: 'Email', value: user?.email },
-            { icon: '📱', label: 'Phone', value: user?.phone || 'Not set' },
-            { icon: '📅', label: 'Member since', value: 'Active member' },
+            { icon: IconMail, label: 'Email', value: user?.email },
+            { icon: IconSmartphone, label: 'Phone', value: user?.phone || 'Not set' },
+            { icon: IconClock, label: 'Member since', value: 'Active member' },
           ].map((item) => (
             <div key={item.label} className="flex items-center gap-3 py-2 border-b border-cream-100 last:border-0">
-              <span className="text-lg">{item.icon}</span>
+              <span className="text-text-muted">
+                <item.icon size={18} />
+              </span>
               <div className="flex-1">
                 <p className="text-xs text-text-muted">{item.label}</p>
                 <p className="text-sm text-text-primary font-medium">{item.value}</p>
@@ -70,7 +75,8 @@ export function ProfilePage() {
         </div>
       </Card>
 
-      <Button variant="danger" onClick={logout} className="w-full">
+      <Button variant="danger" onClick={logout} className="w-full flex items-center justify-center gap-2">
+        <IconLogout size={18} />
         Sign Out
       </Button>
 

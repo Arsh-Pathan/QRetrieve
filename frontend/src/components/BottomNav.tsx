@@ -1,13 +1,14 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useNotifications } from '../hooks/useNotifications';
+import { IconHome, IconPackage, IconQrCode, IconClipboard, IconUser } from './ui/Symbols';
 
 const tabs = [
-  { path: '/dashboard', label: 'Home', icon: '🏠', activeIcon: '🏡' },
-  { path: '/items', label: 'Items', icon: '📦', activeIcon: '📦' },
-  { path: '/qr', label: 'QR', icon: '⊞', activeIcon: '⊞' },
-  { path: '/reports', label: 'Reports', icon: '📋', activeIcon: '📋' },
-  { path: '/profile', label: 'Profile', icon: '👤', activeIcon: '👤' },
+  { path: '/dashboard', label: 'Home', icon: IconHome },
+  { path: '/items', label: 'Items', icon: IconPackage },
+  { path: '/qr', label: 'QR', icon: IconQrCode },
+  { path: '/reports', label: 'Reports', icon: IconClipboard },
+  { path: '/profile', label: 'Profile', icon: IconUser },
 ];
 
 export function BottomNav() {
@@ -31,7 +32,7 @@ export function BottomNav() {
             {({ isActive }) => (
               <>
                 <span className="text-lg relative">
-                  {isActive ? tab.activeIcon : tab.icon}
+                  <tab.icon size={20} strokeWidth={isActive ? 2.5 : 2} />
                   {tab.label === 'Home' && unreadCount > 0 && (
                     <span className="absolute -top-1 -right-2.5 bg-accent-coral text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center animate-pulse-soft">
                       {unreadCount > 9 ? '9+' : unreadCount}

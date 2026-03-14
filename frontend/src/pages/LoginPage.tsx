@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
+import { IconMail, IconLock } from '../components/ui/Symbols';
 
 export function LoginPage() {
   const { login } = useAuth();
@@ -26,18 +27,20 @@ export function LoginPage() {
   };
 
   return (
-    <Card className="animate-slide-up">
-      <h2 className="text-xl font-bold text-text-primary mb-1">Welcome back</h2>
-      <p className="text-sm text-text-muted mb-5">Sign in to manage your items</p>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <Card className="animate-slide-up !p-8 shadow-glow-purple/10">
+      <div className="mb-8 overflow-hidden">
+        <h2 className="text-2xl font-black text-text-primary mb-1">Welcome Back</h2>
+        <p className="text-sm text-text-muted">Sign in to manage your items</p>
+      </div>
+      <form onSubmit={handleSubmit} className="space-y-5">
         <Input
-          label="Email"
+          label="Email Address"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
           placeholder="you@example.com"
-          icon={<span className="text-sm">📧</span>}
+          icon={<IconMail size={16} className="text-text-muted" />}
         />
         <Input
           label="Password"
@@ -46,20 +49,20 @@ export function LoginPage() {
           onChange={(e) => setPassword(e.target.value)}
           required
           placeholder="••••••••"
-          icon={<span className="text-sm">🔒</span>}
+          icon={<IconLock size={16} className="text-text-muted" />}
         />
         {error && (
-          <div className="p-3 rounded-2xl bg-pastel-peach-light text-sm text-red-600">
+          <div className="p-4 rounded-2xl bg-pastel-peach-light text-xs font-bold text-accent-red border border-accent-red/10 animate-shake">
             {error}
           </div>
         )}
-        <Button type="submit" className="w-full" loading={loading}>
+        <Button type="submit" className="w-full !py-4 shadow-soft" loading={loading}>
           Sign In
         </Button>
       </form>
-      <p className="text-center text-sm text-text-secondary mt-5">
+      <p className="text-center text-sm text-text-secondary mt-8 font-medium">
         Don't have an account?{' '}
-        <Link to="/register" className="text-accent-purple font-semibold hover:underline">Sign up</Link>
+        <Link to="/register" className="text-accent-purple font-bold hover:underline decoration-2 underline-offset-4">Sign up</Link>
       </p>
     </Card>
   );

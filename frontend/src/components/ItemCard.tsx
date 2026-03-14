@@ -1,6 +1,7 @@
 import React from 'react';
 import { Item } from '../services/item.service';
 import { Card } from './ui/Card';
+import { IconSmartphone, IconQrCode, IconTrash } from './ui/Symbols';
 
 const statusConfig: Record<string, { bg: string; text: string }> = {
   safe: { bg: 'bg-pastel-sage-light', text: 'text-green-700' },
@@ -23,8 +24,8 @@ export function ItemCard({ item, onViewQR, onDelete }: ItemCardProps) {
       {item.photoUrl ? (
         <img src={item.photoUrl} alt={item.itemName} className="w-16 h-16 rounded-2xl object-cover flex-shrink-0" />
       ) : (
-        <div className="w-16 h-16 rounded-2xl bg-pastel-lavender-light flex items-center justify-center flex-shrink-0">
-          <span className="text-2xl">📱</span>
+        <div className="w-16 h-16 rounded-2xl bg-pastel-lavender-light flex items-center justify-center flex-shrink-0 text-accent-purple opacity-70">
+          <IconSmartphone size={24} />
         </div>
       )}
       {/* Info */}
@@ -42,17 +43,19 @@ export function ItemCard({ item, onViewQR, onDelete }: ItemCardProps) {
           {onViewQR && (
             <button
               onClick={onViewQR}
-              className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-pastel-lavender-light text-accent-purple 
-                text-xs font-semibold hover:bg-pastel-lavender transition-all"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pastel-lavender-light text-accent-purple 
+                text-xs font-bold hover:bg-pastel-lavender transition-all shadow-sm active:scale-95"
             >
-              ⊞ QR Code
+              <IconQrCode size={14} />
+              QR Code
             </button>
           )}
           {onDelete && (
             <button
               onClick={onDelete}
-              className="text-xs text-text-muted font-medium hover:text-accent-red transition-colors"
+              className="text-xs text-text-muted font-medium hover:text-accent-red transition-colors flex items-center gap-1"
             >
+              <IconTrash size={12} />
               Delete
             </button>
           )}
